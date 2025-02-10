@@ -98,7 +98,7 @@ const MovieDetail = () => {
         setLoading(false);
       } catch (error) {
         console.log(error);
-        setError("Киноны мэдээллийг татахад алдаа гарлаа.");
+        setError("An error occurred while retrieving movie data.");
         setLoading(false);
       }
     };

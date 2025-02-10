@@ -43,13 +43,13 @@ export default function Home() {
             Follow us
             <div className="w-[68px] h-[116px] flex justify-between items-start flex-col">
               <Link
-                href="https://www.facebook.com/hugiinnowsh/"
+                href="https://www.facebook.com/pinecone.academy.mongolia"
                 className="w-[66px] h-[20px] font-medium"
               >
                 Facebook
               </Link>
               <Link
-                href="https://www.instagram.com/tuugii_ji/"
+                href="https://www.instagram.com/_dtgsuuuuu/"
                 className="w-[66px] h-[20px] font-medium"
               >
                 Instagram

@@ -19,12 +19,10 @@ import { Button } from "@/components/ui/button";
 import SearchFull from "../Search";
 import { Search } from "lucide-react";
 import { X } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import Dropdown from "../Dropdown";
 import { useState } from "react";
 import { Film } from "lucide-react";
 export default function Home() {
-  // const [error, SetError] = useState();
 
   try {
   } catch (error) {
@@ -37,7 +35,7 @@ export default function Home() {
     <div className="w-full h-[59px] ">
       <div className="w-full h-[59px] flex justify-center items-center fixed z-40 bg-white dark:bg-black px-4 sm:px-6">
         <div className="w-full max-w-[1280px] h-[36px] flex justify-between items-center">
-          <div className="flex gap-2 text-indigo-700 bold">
+          <div className="flex gap-2 text-indigo-700 font-bold">
             <Film />
             Movie Z
           </div>

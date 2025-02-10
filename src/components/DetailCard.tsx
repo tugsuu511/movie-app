@@ -3,7 +3,7 @@ import { Play } from "lucide-react";
 import StarSize from "@/icons/StarSize";
 
 interface Movie {
-  id: number; // Киноны ID-г нэмэх шаардлагатай
+  id: number; 
   title: string;
   vote_average: number;
   overview: string;
@@ -46,7 +46,7 @@ const DetailCard: FC<DetailCardProps> = ({ movie, fetchTrailer }) => {
       <div className="w-[335px] h-[52px] flex justify-between items-center">
         <button
           className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-9 px-4 py-2"
-          onClick={() => fetchTrailer(movie.id)} // Зөв ID-г дамжуулж байна
+          onClick={() => fetchTrailer(movie.id)} 
         >
           <Play className="w-4 h-4" /> Watch Trailer
         </button>
