@@ -1,169 +1,194 @@
 "use client";
-import { useEffect, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
-import { Movie } from "@/types/Movie-type";
-import Image from "next/image";
-import { Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  // CardDescription,
-  // CardFooter,
-  // CardHeader,
-  // CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useState, useRef } from "react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
- 
+import Image from "next/legacy/image";
+import Seemore from "../components/Seemore";
+import DetailCard from "../components/DetailCard";
+import { X } from "lucide-react";
+import { Movie } from "@/types/Movie-type";
+
 const TMDB_BASE_URL = process.env.TMDB_BASE_URL;
-const TMDB_API_TOKEN = process.env.TMDB_API_TOKEN;
- 
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+
+
 export default function Home() {
-  const [nowPlayingData, setNowPlayingData] = useState<Movie[]>([]);
-  const getMovieData = async () => {
-    try {
-      const response = await axios.get(
-        `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1`,
-        {
-          headers: {
-            Authorization: `Bearer ${TMDB_API_TOKEN}`,
-          },
-        }
-      );
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
- 
-  const getNowPlayingMovieData = async () => {
-    try {
-      const response = await axios.get(
-        `${TMDB_BASE_URL}/movie/now_playing?language=en-US&page=1`,
-        {
-          headers: {
-            Authorization: `Bearer ${TMDB_API_TOKEN}`,
-          },
-        }
-      );
-      console.log("Now Playing Movies:", response.data.results);
-      setNowPlayingData(response.data.results);
-    } catch (err) {
-      console.log(err);
-    }
-  };
- 
+  const [, setLoading] = useState(false);
+  const [, setError] = useState("");
+  const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
+  const [upcomingMovies, setUpcomingMovies] = useState<Movie[]>([]);
+  const [topRated, setTopRated] = useState<Movie[]>([]);
+  const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
+  const [trailer, setTrailer] = useState<{ key: string } | null>(null);
+  const [showTrailer, setShowTrailer] = useState(false);
+
+  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
+
   useEffect(() => {
+    const getMovieData = async () => {
+      try {
+        setLoading(true);
+
+        const [upcomingRes, popularRes, topRatedRes, nowPlayingRes] =
+          await Promise.all([
+            axios.get(`${TMDB_BASE_URL}/movie/upcoming?language=en-US&page=1`, {
+              headers: {
+                Authorization: `Bearer ${TMDB_API_KEY}`,
+              },
+            }),
+            axios.get(`${TMDB_BASE_URL}/movie/popular?language=en-US&page=1`, {
+              headers: {
+                Authorization: `Bearer ${TMDB_API_KEY}`,
+              },
+            }),
+            axios.get(
+              `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1`,
+              {
+                headers: {
+                  Authorization: `Bearer ${TMDB_API_KEY}`,
+                },
+              }
+            ),
+            axios.get(
+              `${TMDB_BASE_URL}/movie/now_playing?language=en-US&page=1`,
+              {
+                headers: {
+                  Authorization: `Bearer ${TMDB_API_KEY}`,
+                },
+              }
+            ),
+          ]);
+
+        setUpcomingMovies(upcomingRes.data.results);
+        setPopularMovies(popularRes.data.results);
+        setTopRated(topRatedRes.data.results);
+        setNowPlaying(nowPlayingRes.data.results);
+
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        if (axios.isAxiosError(error)) {
+          setError(
+            error.response?.data.status_message || "Error fetching data"
+          );
+        }
+      }
+    };
+
     getMovieData();
-    getNowPlayingMovieData();
   }, []);
- 
+
+  const fetchTrailer = async (movieId: number) => {
+    try {
+      console.log("Fetching trailer for movie ID:", movieId);
+
+      const trailerRes = await axios.get(
+        `${TMDB_BASE_URL}/movie/${movieId}/videos?language=en-US`,
+        {
+          headers: {
+            Authorization: `Bearer ${TMDB_API_KEY}`,
+          },
+        }
+      );
+
+      const officialTrailer = trailerRes.data.results.find(
+        (video: { type: string; site: string }) =>
+          video.type === "Trailer" && video.site === "YouTube"
+      );
+
+      if (officialTrailer) {
+        setTrailer(officialTrailer);
+        setShowTrailer(true);
+      } else {
+       
+      }
+    } catch (error) {
+      console.error("Failed to fetch trailer:", error);
+      if (axios.isAxiosError(error)) {
+        alert(
+          `Failed to fetch trailer: ${
+            error.response?.data.status_message || "Unknown error"
+          }`
+        );
+      }
+    }
+  };
+
   return (
-    <div className="h-screen w-screen">
-      <div className="md:hidden">
-        <Carousel className="w-screen flex flex-col p-0 ">
+    <>
+      <div className="w-full h-auto flex justify-between items-center flex-col mb-10 gap-12 sm:gap-20">
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full relative"
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+        >
+          <CarouselPrevious className="left-5 sm:left-11 z-20 top-40 xl:top-80" />
           <CarouselContent>
-            {nowPlayingData.slice(0, 10).map((movie) => (
-              <CarouselItem key={movie.id}>
-                <div>
-                  <Card>
-                    <CardContent className="flex  justify-center p-0">
-                      <div className="">
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w300${movie.backdrop_path}`}
-                          width={1000}
-                          height={250}
-                          alt="Picture of the author"
-                        />
-                        <div className="p-5">
-                          <div className="flex justify-between">
-                            <div>
-                              <p>Now playing:</p>
-                              <h3 className="font-semibold text-2xl">
-                                {movie.title}
-                              </h3>
-                            </div>
-                            <div className="flex gap-1 items-center">
-                              <Star className="text-yellow-400 w-7 h-7" />
-                              {movie.vote_average}/10
-                            </div>
-                          </div>
-                          <div>
-                            <p className="font-normal text-sm leading-5 my-4 h-[100px] overflow-hidden overflow-y-auto">
-                              {movie.overview}
-                            </p>
-                          </div>
-                          <Button>
-                            <Play />
-                            Watch trailer
-                          </Button>
-                        </div>
-                      </div>
+            {nowPlaying.slice(0, 10).map((movie, index) => (
+              <CarouselItem key={index}>
+                <div className="relative">
+                  <Card className="w-full sm:w-screen overflow-hidden">
+                    <CardContent className="flex items-center justify-center h-[300px] sm:h-[600px] w-full relative p-0 overflow-hidden">
+                      <Image
+                        src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+                        alt={movie.title}
+                        objectFit="cover"
+                        layout="fill"
+                      />
                     </CardContent>
                   </Card>
+                  <DetailCard movie={movie} fetchTrailer={fetchTrailer} />
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious />
+          <CarouselNext className="right-5 sm:right-11 z-20 top-40 xl:top-80" />
         </Carousel>
+
+        <Seemore
+          movies={upcomingMovies}
+          title={"Upcoming"}
+          loading={false}
+          link="/category/upcoming/1"
+        />
+        <Seemore
+          movies={popularMovies}
+          title={"Popular"}
+          loading={false}
+          link="/category/popular/1"
+        />
+        <Seemore
+          movies={topRated}
+          title={"Top Rated"}
+          loading={false}
+          link="/category/top_rated/1"
+        />
       </div>
- 
-      <div>
-      <Carousel className="w-screen flex flex-col p-0 ">
-          <CarouselContent>
-            {nowPlayingData.slice(0, 10).map((movie) => (
-              <CarouselItem key={movie.id}>
-                <div>
-                  <Card>
-                    <CardContent className="p-0 ">
-                      <div className="">
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w300${movie.backdrop_path}`}
-                          width={10000}
-                          height={600}
-                          alt="Picture of the author"
-                          className="absolute "
-                        />
-                        <div className="p-5 relative top-0 left-0 h-[600px]">
-                          <div className="flex flex-col gap-3">
-                            <div className="text-white">
-                              <p>Now playing:</p>
-                              <h3 className="font-semibold text-2xl">
-                                {movie.title}
-                              </h3>
-                            </div>
-                            <div className="flex gap-1 items-center text-white">
-                              <Star className="text-yellow-400 w-7 h-7" />
-                              {movie.vote_average}/10
-                            </div>
-                          </div>
-                          <div>
-                            <p className="font-normal text-sm leading-5 my-4 w-[302px] h-[100px] overflow-hidden overflow-y-auto text-white">
-                              {movie.overview}
-                            </p>
-                          </div>
-                          <Button>
-                            <Play />
-                            Watch trailer
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-        </Carousel>
-      </div>
-    </div>
+
+      {showTrailer && trailer && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+          <iframe
+            width="800"
+            height="450"
+            src={`https://www.youtube.com/embed/${trailer.key}`}
+            title="Trailer"
+            allowFullScreen
+          ></iframe>
+          <X
+            onClick={() => setShowTrailer(false)}
+            className="absolute top-4 right-4 text-white cursor-pointer"
+          />
+        </div>
+      )}
+    </>
   );
 }
