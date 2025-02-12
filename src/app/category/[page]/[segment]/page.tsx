@@ -57,7 +57,7 @@ const CategoryPage = () => {
     router.push(`/category/${segment}/${pageNumber}`);
   };
 
-  if (loading) return <p>Уншиж байна...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p>errror</p>;
 
   return (
