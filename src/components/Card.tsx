@@ -14,7 +14,7 @@ interface MovieCardProps {
 
 export const MovieCard = ({ src, name, rating }: MovieCardProps) => {
   return (
-    <Card className="w-[158px] h-[309px] sm:w-[230px] sm:h-[439px] flex items-center justify-center rounded">
+    <Card className="w-[158px] h-[309px] sm:w-[230px] sm:h-[439px] flex items-center justify-center rounded-xl overflow-hidden">
       <CardContent className="flex flex-col items-center justify-center overflow-hidden p-0 bg-customcard dark:bg-customcarddark w-[158px] h-[309px] sm:w-[230px] sm:h-[439px]">
         <div className="sm:w-[229.73px] sm:h-[340px] rounded w-[157.5px] h-[233px]">
           <Image

@@ -49,7 +49,7 @@ export default function Home() {
                 Facebook
               </Link>
               <Link
-                href="https://www.instagram.com/_dtgsuuuuu/"
+                href="https://www.instagram.com/pineconemongolia/"
                 className="w-[66px] h-[20px] font-medium"
               >
                 Instagram

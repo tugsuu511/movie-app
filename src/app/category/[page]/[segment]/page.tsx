@@ -35,6 +35,11 @@ const CategoryPage = () => {
 
   useEffect(() => {
     const fetchMovies = async () => {
+      console.log(TMDB_API_KEY);
+      console.log(TMDB_BASE_URL);
+      
+      
+      
       try {
         const response = await axios.get(
           `${TMDB_BASE_URL}/movie/${segment}?language=en-US&page=${currentPage}`,
@@ -45,7 +50,7 @@ const CategoryPage = () => {
         setLoading(false);
       } catch (error) {
         console.log(error);
-        setError("Киноны мэдээллийг татахад алдаа гарлаа.");
+        setError("An error occurred while retrieving movie data.");
         setLoading(false);
       }
     };
@@ -58,7 +63,7 @@ const CategoryPage = () => {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>errror</p>;
+  if (error) return <p>error</p>;
 
   return (
     <div className="w-screen h-auto flex justify-center items-center my-10">

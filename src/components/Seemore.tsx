@@ -25,7 +25,7 @@ const Seemore: FC<SeemoreProps> = ({ movies, title, loading, link }) => {
           {title}
         </h1>
         <Link href={link}>
-          <button className="w-[120px] h-[36px] px-4 py-2 flex justify-between items-center font-medium">
+          <button className="w-[120px] h-[36px] px-4 py-2 flex justify-between items-center font-medium border rounded-sm">
             See more
             <Nexticon />
           </button>
